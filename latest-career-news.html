@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV Career News Digest — Senin, 23 November 2026</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-alt: #f0f2f8;
+      --text: #141824;
+      --muted: #556077;
+      --border: #e1e6f0;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --p1: #0f766e; --p1-bg: #f0fdfa;
+      --p2: #7c3aed; --p2-bg: #f5f3ff;
+      --p3: #c2410c; --p3-bg: #fff7ed;
+      --p4: #0369a1; --p4-bg: #f0f9ff;
+      --p5: #be185d; --p5-bg: #fdf2f8;
+      --shadow: 0 4px 20px rgba(20, 24, 36, 0.05);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 24px 16px 64px;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    header.hero {
+      background: linear-gradient(135deg, #111827 0%, #1e293b 55%, #0f172a 100%);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .edition-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .profile-tag {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    header.hero h1 {
+      font-size: clamp(1.6rem, 3.2vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    header.hero p.subtitle {
+      color: #cbd5e1;
+      max-width: 780px;
+      font-size: 0.98rem;
+    }
+
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .filter-btn:hover {
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    .filter-btn.active {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 26px rgba(20, 24, 36, 0.08);
+    }
+
+    .card.hidden {
+      display: none;
+    }
+
+    .card-meta-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .pillar-badge {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .p1 { color: var(--p1); background: var(--p1-bg); }
+    .p2 { color: var(--p2); background: var(--p2-bg); }
+    .p3 { color: var(--p3); background: var(--p3-bg); }
+    .p4 { color: var(--p4); background: var(--p4-bg); }
+    .p5 { color: var(--p5); background: var(--p5-bg); }
+
+    .source-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .card h2 {
+      font-size: 1.12rem;
+      line-height: 1.4;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .summary {
+      font-size: 0.93rem;
+      color: #2b3446;
+      margin-bottom: 12px;
+    }
+
+    .cv-relevance {
+      background: var(--surface-alt);
+      border-left: 3.5px solid var(--accent);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      color: #1e293b;
+    }
+
+    .cv-relevance strong {
+      color: #0f172a;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 0.84rem;
+    }
+
+    .source-link {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .source-link:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 36px;
+      text-align: center;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      header.hero { padding: 22px 18px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div class="hero-top">
+        <span class="edition-badge">Edisi: Senin, 23 November 2026</span>
+        <span class="profile-tag">Kurasi CV Wicaksono Arie Dewanto (2026) • Musik, AV, AI, IT &amp; Kreatif</span>
+      </div>
+      <h1>CV Career News Digest</h1>
+      <p class="subtitle">
+        Ringkasan berita terkini dari media kredibel yang disaring berdasarkan lima pilar kompetensi: musik &amp; live performance, produksi audio-visual &amp; broadcasting, AI kreatif &amp; hak cipta, hardware &amp; komputasi lokal, serta pemasaran &amp; ekonomi kreatif.
+      </p>
+    </header>
+
+    <nav class="filter-bar" aria-label="Filter Pilar CV">
+      <span class="filter-label">Filter Pilar:</span>
+      <button class="filter-btn active" data-filter="all">Semua (7)</button>
+      <button class="filter-btn" data-filter="p1">1. Musik &amp; Live Performance</button>
+      <button class="filter-btn" data-filter="p2">2. Produksi Audio-Visual &amp; Broadcast</button>
+      <button class="filter-btn" data-filter="p3">3. AI Kreatif &amp; Hak Cipta</button>
+      <button class="filter-btn" data-filter="p4">4. Hardware &amp; Komputasi Lokal</button>
+      <button class="filter-btn" data-filter="p5">5. Pemasaran &amp; Ekonomi Kreatif</button>
+    </nav>
+
+    <main class="grid" id="newsGrid">
+      <!-- Pilar 1 -->
+      <article class="card" data-pillar="p1">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p1">Musik, Session Bass &amp; Live Performance</span>
+            <span class="source-date">Bloomberg Technoz • 21 Nov 2026</span>
+          </div>
+          <h2>Gelombang Konser &amp; Festival Akhir Tahun 2026 Padati Panggung Indonesia</h2>
+          <p class="summary">
+            Kalender pertunjukan musik nasional sepanjang November hingga Desember 2026 dipenuhi konser skala stadion dan festival lintas genre, mulai dari rock, pop-punk, alternatif, hingga K-pop dan elektronik. Momentum ini mempertegas tingginya aktivitas panggung live menjelang tutup tahun di Indonesia.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Mendukung pemetaan dinamika ekosistem live performance, kebutuhan aransemen panggung, dan peluang kolaborasi musisi lintas genre.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Agenda Industri Live</span>
+          <a class="source-link" href="https://www.bloombergtechnoz.com/detail-news/128464/deretan-konser-musik-di-indonesia-november-desember-2026-mcr-bts" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+
+      <!-- Pilar 2 -->
+      <article class="card" data-pillar="p2">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p2">Produksi Audio-Visual &amp; Broadcasting</span>
+            <span class="source-date">Jogja Insight • 21 Nov 2026</span>
+          </div>
+          <h2>Teknologi Spatial Audio Buatan Yogyakarta Tembus Pasar Global</h2>
+          <p class="summary">
+            Rangkaian forum dan pameran Sound Ecology &amp; Immersive Experiences di Yogyakarta pada 18-19 November 2026 menyoroti perkembangan spatial audio dan pertunjukan audio-visual imersif. Inovasi ini menunjukkan pertumbuhan produksi suara multidimensi berbasis talenta kreatif lokal yang mampu bersaing secara internasional.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Sejalan dengan latar belakang produksi audio-visual, broadcasting, dan eksperimen soundscape imersif di studio mandiri.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Spatial Audio &amp; AV</span>
+          <a class="source-link" href="https://jogjainsight.com/2026/11/21/teknologi-spatial-audio-buatan-yogyakarta-tembus-pasar-global-dorong-kreativitas-anak-muda/" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+
+      <!-- Pilar 3 -->
+      <article class="card" data-pillar="p3">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p3">AI Kreatif &amp; Etika AI</span>
+            <span class="source-date">Kedaulatan Rakyat • 17 Nov 2026</span>
+          </div>
+          <h2>Pembahasan RUU Hak Cipta Dorong Aturan Tegas atas Karya Buatan AI</h2>
+          <p class="summary">
+            Dalam agenda pembahasan RUU Hak Cipta pada pertengahan November 2026, muncul dorongan agar regulasi mengatur secara jelas status dan perlindungan karya yang melibatkan kecerdasan buatan. Kejelasan aturan dinilai penting untuk melindungi kreator manusia sekaligus memberi kepastian pemanfaatan AI di industri kreatif.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Penting sebagai rujukan etika produksi musik dan audio-visual berbasis AI agar karya tetap mematuhi prinsip orisinalitas dan hak cipta.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Regulasi AI &amp; Hak Cipta</span>
+          <a class="source-link" href="https://www.kr.co.id/2026/11/antisipasi-karya-buatan-ai-ruu-hak.html" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+
+      <!-- Pilar 3b -->
+      <article class="card" data-pillar="p3">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p3">AI Kreatif &amp; Etika AI</span>
+            <span class="source-date">Law Commentary • 19 Nov 2026</span>
+          </div>
+          <h2>Sengketa Hak Cipta Musik AI Berlanjut dengan Penyerahan Dokumen Deteksi AI</h2>
+          <p class="summary">
+            Dalam perkara gugatan hak cipta label rekaman besar terhadap pengembang musik AI Suno, distributor musik DistroKid menyerahkan dokumen terkait teknologi deteksi AI sehingga permintaan paksaan pengadilan dicabut. Perkembangan ini menegaskan semakin ketatnya transparansi dan pembuktian asal-usul audio AI di industri musik.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Relevan bagi produser musik dan kreator konten yang mengombinasikan alat AI generatif dengan aransemen dan rekaman orisinal.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Hukum &amp; Musik AI</span>
+          <a class="source-link" href="https://www.lawcommentary.com/articles/distrokid-ai-music-data-suno-copyright-lawsuit" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+
+      <!-- Pilar 4 -->
+      <article class="card" data-pillar="p4">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p4">Teknis IT, Hardware &amp; Otomasi Studio</span>
+            <span class="source-date">NVIDIA Blog • 18 Nov 2026</span>
+          </div>
+          <h2>Desktop Ringkas RTX Spark Hadir untuk Komputasi AI Lokal &amp; Kreator</h2>
+          <p class="summary">
+            Perangkat desktop ringkas berbasis arsitektur RTX dengan memori terpadu hingga 128 GB mulai tersedia melalui sejumlah mitra produsen PC pada pertengahan November 2026. Perangkat ini dirancang untuk menjalankan beban kerja AI lokal, pengembangan model, dan proses kreatif tanpa bergantung penuh pada cloud.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Selaras dengan tren workstation ringkas dan inferensi AI lokal yang efisien ruang dan daya untuk kebutuhan studio kreatif.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Local AI &amp; Compact PC</span>
+          <a class="source-link" href="https://blogs.nvidia.com/blog/rtx-spark-desktop-local-ai-available-now/" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+
+      <!-- Pilar 4b -->
+      <article class="card" data-pillar="p4">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p4">Teknis IT, Hardware &amp; Otomasi Studio</span>
+            <span class="source-date">RRI • 19 Nov 2026</span>
+          </div>
+          <h2>ASUS Umumkan Mini PC ProArt GR1X Berbasis AI Performa Tinggi</h2>
+          <p class="summary">
+            ASUS memperkenalkan ketersediaan mini PC ProArt GR1X yang menyasar kebutuhan pemrosesan AI lokal berperforma tinggi dalam bodi ringkas. Langkah ini memperluas pilihan perangkat form-factor kecil bagi kreator dan pengembang yang mengutamakan komputasi mandiri.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Menguatkan arah pemanfaatan mini PC sebagai pusat komputasi kreatif dan otomasi lokal yang ringkas.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Mini PC Kreator</span>
+          <a class="source-link" href="https://rri.co.id/sibolga/iptek/2909075/asus-hadirkan-proart-gr1x-mini-pc-berbasis-ai-berperforma-tinggi" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+
+      <!-- Pilar 5 -->
+      <article class="card" data-pillar="p5">
+        <div>
+          <div class="card-meta-top">
+            <span class="pillar-badge p5">Pemasaran Digital, E-Commerce &amp; Manajemen Kreatif</span>
+            <span class="source-date">Novexa • 5 Nov 2026</span>
+          </div>
+          <h2>Adaptasi Pemasaran Digital ke GEO, Sinyal E-E-A-T, dan Konten Human-Centric</h2>
+          <p class="summary">
+            Strategi pemasaran digital pada akhir 2026 bergeser menuju Generative Engine Optimization (GEO), penguatan kredibilitas pengalaman nyata (E-E-A-T), serta pendekatan media sosial berbasis dokumentasi autentik. Konten dengan sudut pandang praktisi dan studi kasus nyata menjadi pembeda utama di tengah banjir konten otomatis.
+          </p>
+          <div class="cv-relevance">
+            <strong>Relevansi CV:</strong> Mendukung strategi positioning portofolio kreatif, jasa produksi audio-visual, dan pemasaran digital berbasis keahlian praktis.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Strategi Digital &amp; GEO</span>
+          <a class="source-link" href="https://novexa.id/artikel/update-digital-marketing-november-2026/" target="_blank" rel="noopener noreferrer">Baca Sumber</a>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      Ringkasan kurasi berita edisi Senin, 23 November 2026 • Disusun otomatis untuk pemantauan industri kreatif &amp; teknologi.
+    </footer>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.card');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+        cards.forEach((card) => {
+          if (filter === 'all' || card.getAttribute('data-pillar') === filter) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

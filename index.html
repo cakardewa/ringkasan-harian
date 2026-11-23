@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ringkasan Harian</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.92);
+    }
+    .brand-title {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .brand-sub {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .nav-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .nav-btn {
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .nav-btn:hover,
+    .nav-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .nav-btn.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    main {
+      max-width: 1240px;
+      margin: 20px auto;
+      padding: 0 16px 32px;
+    }
+    .viewer-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .viewer-bar {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .viewer-bar strong {
+      color: var(--text);
+    }
+    .viewer-bar a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    iframe {
+      width: 100%;
+      height: 82vh;
+      min-height: 620px;
+      border: 0;
+      display: block;
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 class="brand-title">Ringkasan Harian</h1>
+      <p class="brand-sub">Portal Digest Otomatis • Diperbarui Harian</p>
+    </div>
+    <nav class="nav-group" aria-label="Navigasi Ringkasan">
+      <button
+        type="button"
+        class="nav-btn active"
+        data-src="./latest-career-news.html"
+        data-label="Berita CV (Edisi Terbaru)">
+        Berita CV
+      </button>
+      <button
+        type="button"
+        class="nav-btn"
+        data-src="./latest-inbox.html"
+        data-label="Email Harian (Edisi Terbaru)">
+        Email Harian
+      </button>
+      <span class="nav-btn disabled" title="Slot siap untuk modul/skill baru">
+        + Modul Menyusul
+      </span>
+    </nav>
+  </header>
+
+  <main>
+    <section class="viewer-card">
+      <div class="viewer-bar">
+        <span>Aktif: <strong id="activeLabel">Berita CV (Edisi Terbaru)</strong></span>
+        <a id="openFullLink" href="./latest-career-news.html" target="_blank">
+          Buka di Tab Baru ↗
+        </a>
+      </div>
+      <iframe
+        id="digestFrame"
+        src="./latest-career-news.html"
+        title="Viewer Ringkasan Harian"
+        loading="lazy">
+      </iframe>
+    </section>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll('.nav-btn[data-src]');
+    const frame = document.getElementById('digestFrame');
+    const activeLabel = document.getElementById('activeLabel');
+    const openFullLink = document.getElementById('openFullLink');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const targetSrc = btn.getAttribute('data-src');
+        const labelText = btn.getAttribute('data-label');
+
+        frame.src = targetSrc;
+        openFullLink.href = targetSrc;
+        activeLabel.textContent = labelText;
+      });
+    });
+  </script>
+</body>
+</html>
