@@ -1,553 +1,120 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SUSI — Daily Inbox Digest (23 Nov 2026)</title>
-<style>
-  :root {
-    --bg-app: #0f172a;
-    --bg-sidebar: #111827;
-    --bg-list: #151e32;
-    --bg-card: #1e293b;
-    --bg-card-hover: #253349;
-    --bg-panel: #0b1120;
-    --border-color: #334155;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --accent: #38bdf8;
-    --accent-strong: #0284c7;
-    --cat-prioritas: #f43f5e;
-    --cat-keuangan: #10b981;
-    --cat-keamanan: #f59e0b;
-    --cat-informasi: #38bdf8;
-    --danger: #ef4444;
-    --danger-hover: #dc2626;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
-    background: var(--bg-app);
-    color: var(--text-primary);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .topbar {
-    height: 58px;
-    background: #090d16;
-    border-bottom: 1px solid var(--border-color);
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 30;
-  }
-
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-badge {
-    width: 34px; height: 34px; border-radius: 8px;
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; color: #fff; font-size: 13px;
-  }
-  .brand-title h1 { font-size: 15px; font-weight: 700; }
-  .brand-title span { font-size: 11px; color: var(--text-secondary); display: block; }
-
-  .stats-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .stat-pill {
-    background: #1e293b; border: 1px solid var(--border-color);
-    border-radius: 999px; padding: 5px 12px; font-size: 12px;
-    display: flex; align-items: center; gap: 6px; color: var(--text-secondary);
-  }
-  .stat-pill strong { color: var(--text-primary); }
-  .stat-pill.warn {
-    border-color: rgba(245, 158, 11, 0.5);
-    background: rgba(245, 158, 11, 0.14);
-    color: #fcd34d;
-  }
-  .stat-pill.danger {
-    border-color: rgba(239, 68, 68, 0.5);
-    background: rgba(239, 68, 68, 0.12);
-    color: #fca5a5;
-  }
-
-  .workspace {
-    display: grid;
-    grid-template-columns: 270px 1fr;
-    flex: 1;
-    min-height: calc(100vh - 58px);
-  }
-
-  .sidebar {
-    background: var(--bg-sidebar);
-    border-right: 1px solid var(--border-color);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    position: sticky;
-    top: 58px;
-    height: calc(100vh - 58px);
-    overflow-y: auto;
-  }
-
-  .filter-group label {
-    display: block; font-size: 11px; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--text-muted);
-    font-weight: 700; margin-bottom: 6px;
-  }
-
-  .search-input {
-    width: 100%; background: #1e293b; color: var(--text-primary);
-    border: 1px solid var(--border-color); border-radius: 8px;
-    padding: 8px 10px; font-size: 13px; outline: none;
-  }
-  .search-input:focus { border-color: var(--accent); }
-
-  .cat-list { display: flex; flex-direction: column; gap: 4px; }
-  .cat-btn {
-    width: 100%; background: transparent; border: 1px solid transparent;
-    color: var(--text-secondary); padding: 8px 10px; border-radius: 8px;
-    font-size: 13px; display: flex; align-items: center;
-    justify-content: space-between; cursor: pointer; text-align: left;
-  }
-  .cat-btn:hover { background: #1e293b; color: var(--text-primary); }
-  .cat-btn.active {
-    background: #1e293b; border-color: var(--accent);
-    color: var(--text-primary); font-weight: 600;
-  }
-  .cat-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    display: inline-block; margin-right: 8px;
-  }
-  .cat-count {
-    background: #0f172a; color: var(--text-secondary);
-    font-size: 11px; padding: 2px 7px; border-radius: 999px; font-weight: 600;
-  }
-
-  .sync-box {
-    margin-top: auto;
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.35);
-    border-radius: 10px; padding: 12px;
-  }
-  .sync-box h3 {
-    font-size: 12px; color: #fca5a5; margin-bottom: 6px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .sync-box p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 10px; }
-  .btn-sync {
-    width: 100%; background: var(--danger); color: #fff; border: none;
-    border-radius: 7px; padding: 8px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
-  }
-  .btn-sync:disabled { opacity: 0.45; cursor: not-allowed; }
-
-  .email-list-pane { background: var(--bg-list); display: flex; flex-direction: column; min-width: 0; }
-  .list-header {
-    padding: 12px 24px; border-bottom: 1px solid var(--border-color);
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary);
-    background: #172033; position: sticky; top: 58px; z-index: 20;
-  }
-
-  .email-items {
-    padding: 18px 24px 48px;
-    display: flex; flex-direction: column; gap: 10px;
-    max-width: 1200px; width: 100%;
-  }
-
-  .email-row {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 12px; overflow: hidden; transition: border-color 0.15s;
-  }
-  .email-row.action-needed { border-left: 4px solid var(--cat-keamanan); }
-  .email-row.expanded { border-color: var(--accent); box-shadow: 0 8px 24px rgba(2, 6, 23, 0.45); }
-  .email-row.queued-delete { border-color: rgba(239, 68, 68, 0.6); background: rgba(127, 29, 29, 0.16); }
-
-  .email-card {
-    padding: 14px 18px; cursor: pointer;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .email-card:hover { background: var(--bg-card-hover); }
-  .email-row.queued-delete .card-subject { text-decoration: line-through; color: #fca5a5; }
-
-  .card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .card-sender-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .accordion-chevron { font-size: 11px; color: var(--text-muted); transition: transform 0.2s; }
-  .email-row.expanded .accordion-chevron { transform: rotate(90deg); color: var(--accent); }
-  .card-sender { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
-  .card-time { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
-  .card-subject { font-size: 14px; font-weight: 600; color: #f1f5f9; }
-  .card-snippet { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; }
-  .card-footer { margin-top: 2px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-
-  .badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
-  .badge-prioritas { background: rgba(244, 63, 94, 0.16); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35); }
-  .badge-keuangan { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
-  .badge-keamanan { background: rgba(245, 158, 11, 0.16); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
-  .badge-informasi { background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
-
-  .accordion-panel {
-    display: none; background: var(--bg-panel);
-    border-top: 1px solid var(--border-color); padding: 18px 20px 20px;
-  }
-  .email-row.expanded .accordion-panel { display: block; }
-
-  .panel-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; flex-wrap: wrap; padding-bottom: 14px; margin-bottom: 16px;
-    border-bottom: 1px solid rgba(51, 65, 85, 0.7);
-  }
-  .panel-meta { font-size: 12px; color: var(--text-secondary); }
-  .panel-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-  .btn-action {
-    padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 600;
-    cursor: pointer; border: 1px solid var(--border-color);
-    background: #1e293b; color: var(--text-primary);
-  }
-  .btn-action:hover { background: #334155; }
-  .btn-action.delete-btn { border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; background: rgba(239, 68, 68, 0.12); }
-
-  .panel-summary-card {
-    background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0; padding: 12px 15px; margin-bottom: 14px;
-  }
-  .panel-summary-card h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 5px; }
-  .panel-summary-card p { font-size: 13.5px; color: #e2e8f0; line-height: 1.55; }
-
-  .panel-body-box { background: #111827; border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; }
-  .panel-body-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
-  .panel-body-text { font-size: 14px; line-height: 1.7; color: #cbd5e1; white-space: pre-wrap; }
-
-  .modal-backdrop {
-    position: fixed; inset: 0; background: rgba(2, 6, 23, 0.78);
-    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50;
-  }
-  .modal-backdrop.open { display: flex; }
-  .modal-card { background: #1e293b; border: 1px solid var(--border-color); border-radius: 14px; max-width: 560px; width: 100%; padding: 22px; }
-  .modal-textarea {
-    width: 100%; height: 150px; background: #0f172a; color: #e2e8f0;
-    border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;
-    font-family: monospace; font-size: 12px; margin: 12px 0;
-  }
-
-  @media (max-width: 900px) {
-    .workspace { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ringkasan Email Harian — 2026-11-23</title>
+  <style>
+    :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --muted: #94a3b8; --accent: #34d399; --border: #334155; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 24px; line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; }
+    h1 { margin: 0 0 6px; font-size: 1.6rem; }
+    .sub { color: var(--muted); font-size: 0.9rem; margin: 0; }
+    .overview { background: var(--card); border-left: 4px solid var(--accent); padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 22px; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+    .stat strong { display: block; font-size: 1.35rem; color: var(--accent); }
+    .stat span { font-size: 0.8rem; color: var(--muted); }
+    .mail-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.8rem; }
+    .badge { background: rgba(52, 211, 153, 0.15); color: var(--accent); padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+    .sender { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    h3 { margin: 0 0 6px; font-size: 1.02rem; }
+    p { margin: 0; color: #cbd5e1; font-size: 0.9rem; }
+    footer { margin-top: 26px; color: var(--muted); font-size: 0.8rem; text-align: center; }
+  </style>
 </head>
 <body>
-
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-badge">SUSI</div>
-    <div class="brand-title">
-      <h1>SUSI Daily Inbox Digest</h1>
-      <span>Laporan Harian Gmail 24 Jam Terakhir • Senin, 23 Nov 2026</span>
+  <div class="wrap">
+    <header>
+      <h1>Ringkasan Email Harian</h1>
+      <p class="sub">Edisi 2026-11-23 • Terdeteksi 10 email (24 jam) • Mesin: Gemini API (gemini-3.5-flash-lite)</p>
+    </header>
+    <div class="overview">Kotak masuk didominasi oleh pemberitahuan keamanan akun yang aktif serta peringatan penggunaan kuota layanan Netlify.</div>
+    
+    <div class="stats">
+      <div class="stat"><strong>1</strong><span>Prioritas</span></div>
+      <div class="stat"><strong>0</strong><span>Keuangan</span></div>
+      <div class="stat"><strong>5</strong><span>Keamanan</span></div>
+      <div class="stat"><strong>3</strong><span>Informasi</span></div>
+      <div class="stat"><strong>1</strong><span>Promo</span></div>
     </div>
+    
+    <div class="list">
+      
+            <div class="mail-card">
+              <div class="top"><span class="badge">Keamanan Akun</span><span class="sender">Google <no-reply@accounts.google.com></span></div>
+              <h3>Notifikasi keamanan</h3>
+              <p>Sandi aplikasi baru dibuat untuk akun Google Anda; segera periksa aktivitas jika bukan Anda yang melakukannya.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Keamanan Akun</span><span class="sender">Google <no-reply@accounts.google.com></span></div>
+              <h3>Notifikasi keamanan</h3>
+              <p>Terdeteksi login baru pada perangkat Windows; pastikan aktivitas ini berasal dari Anda.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Keamanan Akun</span><span class="sender">GitHub <noreply@github.com></span></div>
+              <h3>[GitHub] A personal access token (classic) has been added to your account</h3>
+              <p>Token akses personal baru ditambahkan ke akun GitHub Anda, periksa log keamanan jika perlu.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Keamanan Akun</span><span class="sender">GitHub <noreply@github.com></span></div>
+              <h3>[GitHub] A first-party GitHub OAuth application has been added to your account</h3>
+              <p>Aplikasi OAuth GitHub baru (Git Credential Manager) telah diotorisasi untuk mengakses akun Anda.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Prioritas & Tindak Lanjut</span><span class="sender">Netlify <team@netlify.com></span></div>
+              <h3>[Netlify] Action needed: gembur has used all available credits — upgrade to restore full service</h3>
+              <p>Kredit Netlify Anda telah habis dan layanan dibatasi; lakukan upgrade untuk memulihkan layanan penuh.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Informasi</span><span class="sender">Netlify <team@netlify.com></span></div>
+              <h3>[Netlify] You've used 75% of your credits on gembur</h3>
+              <p>Penggunaan kredit Netlify Anda telah mencapai 75%.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Informasi</span><span class="sender">Netlify <team@netlify.com></span></div>
+              <h3>[Netlify] You've used 50% of your credits on gembur</h3>
+              <p>Penggunaan kredit Netlify Anda telah mencapai 50%.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Keamanan Akun</span><span class="sender">Google <no-reply@accounts.google.com></span></div>
+              <h3>Notifikasi keamanan</h3>
+              <p>Anda telah memberikan izin akses akun Google kepada aplikasi Claude for Gmail.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Promo</span><span class="sender">Google Play <googleplaypromo-noreply@google.com></span></div>
+              <h3>🎮 Pilih game di antara lebih dari 200.000 opsi di PC</h3>
+              <p>Promosi penjelajahan ratusan ribu pilihan game di Google Play untuk PC.</p>
+            </div>
+            
+
+            <div class="mail-card">
+              <div class="top"><span class="badge">Informasi</span><span class="sender">Arnie Cole <arnie.cole@backtothebible.org></span></div>
+              <h3>Don’t Be the Turkey That Nobody Wants</h3>
+              <p>Buletin inspirasi dan renungan harian mengenai momen Thanksgiving.</p>
+            </div>
+            
+    </div>
+    <footer>Ringkasan Harian • Diperbarui otomatis via GitHub Pages</footer>
   </div>
-  <div class="stats-bar">
-    <div class="stat-pill">Total: <strong>4</strong></div>
-    <div class="stat-pill warn">Tindak Lanjut: <strong>1</strong></div>
-    <div class="stat-pill danger">Antrean Hapus: <strong id="statDelete">0</strong></div>
-  </div>
-</header>
-
-<div class="workspace">
-  <aside class="sidebar">
-    <div class="filter-group">
-      <label for="searchInput">Cari Pengirim / Subjek</label>
-      <input type="text" id="searchInput" class="search-input" placeholder="Cari kata kunci...">
-    </div>
-
-    <div class="filter-group">
-      <label>Kategori Laporan SUSI</label>
-      <div class="cat-list">
-        <button class="cat-btn active" data-cat="all">
-          <span><span class="cat-dot" style="background:#94a3b8"></span>Semua Kategori</span>
-          <span class="cat-count" id="count-all">4</span>
-        </button>
-        <button class="cat-btn" data-cat="prioritas">
-          <span><span class="cat-dot" style="background:var(--cat-prioritas)"></span>Prioritas Utama</span>
-          <span class="cat-count" id="count-prioritas">0</span>
-        </button>
-        <button class="cat-btn" data-cat="keuangan">
-          <span><span class="cat-dot" style="background:var(--cat-keuangan)"></span>Keuangan &amp; Tagihan</span>
-          <span class="cat-count" id="count-keuangan">0</span>
-        </button>
-        <button class="cat-btn" data-cat="keamanan">
-          <span><span class="cat-dot" style="background:var(--cat-keamanan)"></span>Akun &amp; Keamanan</span>
-          <span class="cat-count" id="count-keamanan">0</span>
-        </button>
-        <button class="cat-btn" data-cat="informasi">
-          <span><span class="cat-dot" style="background:var(--cat-informasi)"></span>Informasi &amp; Newsletter</span>
-          <span class="cat-count" id="count-informasi">0</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="sync-box">
-      <h3><span>Antrean Hapus</span><span id="queueBadge">0 item</span></h3>
-      <p>Tandai email promo/newsletter yang tidak diperlukan lalu salin daftarnya untuk dipindahkan ke Trash.</p>
-      <button id="btnExportDelete" class="btn-sync" disabled>Ekspor Daftar Hapus (0)</button>
-    </div>
-  </aside>
-
-  <section class="email-list-pane">
-    <div class="list-header">
-      <span id="listTitle">Menampilkan 4 email masuk (24 jam terakhir)</span>
-      <button id="btnCollapseAll" class="btn-action" style="padding:4px 9px;font-size:11px;">Tutup Semua</button>
-    </div>
-    <div class="email-items" id="emailItems"></div>
-  </section>
-</div>
-
-<div class="modal-backdrop" id="exportModal">
-  <div class="modal-card">
-    <h3>Daftar Email untuk Dipindahkan ke Trash</h3>
-    <textarea class="modal-textarea" id="exportText" readonly></textarea>
-    <div style="display:flex;justify-content:flex-end;gap:10px;">
-      <button class="btn-action" id="btnCloseModal">Tutup</button>
-      <button class="btn-action" style="background:var(--accent-strong);border-color:var(--accent);" id="btnCopyExport">Salin Teks</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const EMAILS = [
-  {
-    no: 1,
-    tanggal: "22 Nov 2026, 18:36 WIB",
-    pengirim: "Google (no-reply@accounts.google.com)",
-    subjek: "Notifikasi keamanan — Akses Claude for Gmail",
-    kategori: "keamanan",
-    butuhTindakan: true,
-    nominalTenggat: "Tidak ada nominal • Tinjau segera jika akses tidak dikenali",
-    cuplikan: "Claude for Gmail diizinkan untuk mengakses beberapa data Akun Google Anda (ariegembur@gmail.com).",
-    isi_lengkap: "Pemberitahuan keamanan dari Google: Aplikasi pihak ketiga 'Claude for Gmail' telah diberi izin untuk mengakses beberapa data pada Akun Google Anda (ariegembur@gmail.com).\n\nTindak Lanjut: Jika Anda sendiri yang menghubungkannya, tidak perlu tindakan lebih lanjut. Jika Anda tidak mengenali aktivitas ini atau ingin mencabut aksesnya, segera buka halaman Keamanan Akun Google (myaccount.google.com/notifications)."
-  },
-  {
-    no: 2,
-    tanggal: "22 Nov 2026, 10:42 WIB",
-    pengirim: "Spotify (no-reply@spotify.com)",
-    subjek: "Telusuri musik dan putar bersama teman di Dengar Bareng!",
-    kategori: "keuangan",
-    butuhTindakan: false,
-    nominalTenggat: "Rp59.900/bulan setelah masa promo (Opsional / Bukan tagihan aktif)",
-    cuplikan: "Penawaran fitur Dengar Bareng melalui paket Spotify Premium Standard untuk pengguna yang belum pernah mencoba Premium.",
-    isi_lengkap: "Email promosi dari Spotify mengenai fitur 'Dengar Bareng' untuk mendengarkan musik secara sinkron bersama teman.\n\nDetail Harga & Ketentuan: Paket Premium Standard ditawarkan dengan biaya berlangganan Rp59.900/bulan setelah periode penawaran berakhir. Berlaku khusus bagi akun yang belum pernah mencoba layanan Spotify Premium. Tidak ada tagihan aktif yang jatuh tempo."
-  },
-  {
-    no: 3,
-    tanggal: "22 Nov 2026, 18:04 WIB",
-    pengirim: "Google Play (googleplaypromo-noreply@google.com)",
-    subjek: "🎮 Pilih game di antara lebih dari 200.000 opsi di PC",
-    kategori: "informasi",
-    butuhTindakan: false,
-    nominalTenggat: "Tidak ada nominal / tenggat",
-    cuplikan: "Informasi pembaruan katalog lebih dari 200.000 game di Google Play Games di PC.",
-    isi_lengkap: "Buletin informasi dari Google Play Games di PC yang mengumumkan ketersediaan lebih dari 200.000 judul game yang dapat dimainkan di komputer, termasuk sorotan judul seperti Arknights: Endfield, Last War:Survival Game, dan Clash of Clans."
-  },
-  {
-    no: 4,
-    tanggal: "22 Nov 2026, 18:01 WIB",
-    pengirim: "Arnie Cole — Back to the Bible (arnie.cole@backtothebible.org)",
-    subjek: "Don’t Be the Turkey That Nobody Wants",
-    kategori: "informasi",
-    butuhTindakan: false,
-    nominalTenggat: "Tidak ada nominal / tenggat",
-    cuplikan: "Refleksi menjelang Thanksgiving tentang bersyukur di tengah kehilangan dan mendengarkan orang lain.",
-    isi_lengkap: "Newsletter renungan dari Arnie Cole (Back to the Bible) menjelang perayaan Thanksgiving mengenai pentingnya rasa syukur di tengah situasi sulit, menjadi pendengar yang baik bagi sesama, serta rekomendasi episode podcast Spiritually Fit Today bersama Dr. Rob Rhodes."
-  }
-];
-
-const catLabels = {
-  prioritas: "Prioritas Utama",
-  keuangan: "Keuangan & Tagihan",
-  keamanan: "Akun & Keamanan",
-  informasi: "Informasi & Newsletter"
-};
-
-const state = {
-  cat: "all",
-  query: "",
-  expandedNo: null,
-  deleteQueue: new Set()
-};
-
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function updateCounts() {
-  const counts = { all: EMAILS.length, prioritas: 0, keuangan: 0, keamanan: 0, informasi: 0 };
-  EMAILS.forEach(e => { if (counts[e.kategori] !== undefined) counts[e.kategori]++; });
-  Object.keys(counts).forEach(k => {
-    const el = document.getElementById(`count-${k}`);
-    if (el) el.textContent = counts[k];
-  });
-}
-
-function getFiltered() {
-  return EMAILS.filter(e => {
-    if (state.cat !== "all" && e.kategori !== state.cat) return false;
-    if (state.query) {
-      const q = state.query.toLowerCase();
-      const hay = `${e.pengirim} ${e.subjek} ${e.cuplikan} ${e.isi_lengkap}`.toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
-    return true;
-  });
-}
-
-function toggleAccordion(no) {
-  state.expandedNo = state.expandedNo === no ? null : no;
-  renderList();
-  if (state.expandedNo !== null) {
-    const row = document.getElementById(`email-row-${no}`);
-    if (row) requestAnimationFrame(() => row.scrollIntoView({ behavior: "smooth", block: "nearest" }));
-  }
-}
-
-function renderList() {
-  const list = getFiltered();
-  const container = document.getElementById("emailItems");
-  document.getElementById("listTitle").textContent = `Menampilkan ${list.length} email masuk`;
-  container.innerHTML = "";
-
-  if (list.length === 0) {
-    container.innerHTML = `<div style="padding:32px;text-align:center;color:#64748b;">Tidak ada email yang sesuai dengan filter.</div>`;
-    return;
-  }
-
-  list.forEach(email => {
-    const isExpanded = state.expandedNo === email.no;
-    const isQueued = state.deleteQueue.has(email.no);
-    const row = document.createElement("article");
-    row.id = `email-row-${email.no}`;
-    row.className = `email-row${email.butuhTindakan ? " action-needed" : ""}${isExpanded ? " expanded" : ""}${isQueued ? " queued-delete" : ""}`;
-
-    row.innerHTML = `
-      <div class="email-card" role="button" tabindex="0" aria-expanded="${isExpanded}">
-        <div class="card-top">
-          <div class="card-sender-wrap">
-            <span class="accordion-chevron">▶</span>
-            <span class="card-sender">${escapeHtml(email.pengirim)}</span>
-          </div>
-          <span class="card-time">${escapeHtml(email.tanggal)}</span>
-        </div>
-        <div class="card-subject">${email.butuhTindakan ? "⚠️ " : ""}${escapeHtml(email.subjek)}</div>
-        <div class="card-snippet">${escapeHtml(email.cuplikan)}</div>
-        <div class="card-footer">
-          <span class="badge badge-${email.kategori}">${catLabels[email.kategori]}</span>
-          <span style="font-size:11.5px;color:${email.butuhTindakan ? "#fcd34d" : "#94a3b8"};">
-            ${escapeHtml(email.nominalTenggat)}
-          </span>
-        </div>
-      </div>
-
-      <div class="accordion-panel">
-        <div class="panel-toolbar">
-          <div class="panel-meta">Diterima: <strong>${escapeHtml(email.tanggal)}</strong></div>
-          <div class="panel-actions">
-            <button type="button" class="btn-action delete-btn" data-action="delete">
-              ${isQueued ? "Batalkan Tanda Hapus" : "Tandai Hapus"}
-            </button>
-            <button type="button" class="btn-action" data-action="close">✕ Tutup</button>
-          </div>
-        </div>
-        <div class="panel-summary-card">
-          <h4>Ringkasan &amp; Nominal / Tenggat</h4>
-          <p>${escapeHtml(email.nominalTenggat)} — ${escapeHtml(email.cuplikan)}</p>
-        </div>
-        <div class="panel-body-box">
-          <div class="panel-body-label">Detail Lengkap Pesan</div>
-          <div class="panel-body-text">${escapeHtml(email.isi_lengkap)}</div>
-        </div>
-      </div>
-    `;
-
-    row.querySelector(".email-card").addEventListener("click", () => toggleAccordion(email.no));
-    row.querySelector('[data-action="delete"]').addEventListener("click", ev => {
-      ev.stopPropagation();
-      if (state.deleteQueue.has(email.no)) state.deleteQueue.delete(email.no);
-      else state.deleteQueue.add(email.no);
-      updateQueueUI();
-      renderList();
-    });
-    row.querySelector('[data-action="close"]').addEventListener("click", ev => {
-      ev.stopPropagation();
-      state.expandedNo = null;
-      renderList();
-    });
-
-    container.appendChild(row);
-  });
-}
-
-function updateQueueUI() {
-  const count = state.deleteQueue.size;
-  document.getElementById("statDelete").textContent = count;
-  document.getElementById("queueBadge").textContent = `${count} item`;
-  const btn = document.getElementById("btnExportDelete");
-  btn.disabled = count === 0;
-  btn.textContent = `Ekspor Daftar Hapus (${count})`;
-}
-
-document.querySelectorAll(".cat-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    state.cat = btn.dataset.cat;
-    renderList();
-  });
-});
-
-document.getElementById("searchInput").addEventListener("input", e => {
-  state.query = e.target.value.trim();
-  renderList();
-});
-
-document.getElementById("btnCollapseAll").addEventListener("click", () => {
-  state.expandedNo = null;
-  renderList();
-});
-
-document.getElementById("btnExportDelete").addEventListener("click", () => {
-  const items = EMAILS.filter(e => state.deleteQueue.has(e.no));
-  const lines = items.map(e => `- [${e.tanggal}] ${e.pengirim} — ${e.subjek}`);
-  document.getElementById("exportText").value = `Tolong pindahkan ${items.length} email berikut ke Trash Gmail:\n\n` + lines.join("\n");
-  document.getElementById("exportModal").classList.add("open");
-});
-
-document.getElementById("btnCloseModal").addEventListener("click", () => {
-  document.getElementById("exportModal").classList.remove("open");
-});
-
-document.getElementById("btnCopyExport").addEventListener("click", () => {
-  const ta = document.getElementById("exportText");
-  ta.select();
-  document.execCommand("copy");
-  document.getElementById("btnCopyExport").textContent = "Tersalin!";
-  setTimeout(() => { document.getElementById("btnCopyExport").textContent = "Salin Teks"; }, 1500);
-});
-
-updateCounts();
-renderList();
-</script>
 </body>
 </html>
