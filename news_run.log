@@ -1,0 +1,8 @@
+warning: in the working copy of 'inbox_run.log', LF will be replaced by CRLF the next time Git touches it
+[main 6d51ee5] Update Berita CV 2026-11-23
+ 4 files changed, 45 insertions(+), 38 deletions(-)
+ create mode 100644 news_run.log
+To https://github.com/cakardewa/ringkasan-harian.git
+   f1190e5..6d51ee5  main -> main
+[OK] Tersimpan ke D:\K12 DRIVE\Ringkasan Harian\latest-career-news.html dan D:\K12 DRIVE\Ringkasan Harian\archive\CV_Career_News_Digest_2026-11-23.html
+[OK] Selesai push ke GitHub Pages.
