@@ -7,11 +7,15 @@ import os
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
+from typing import Callable, TypeVar
 
 import requests
 from dotenv import load_dotenv
 from google import genai
+
+T = TypeVar("T")
 
 BASE_DIR = Path(__file__).resolve().parent
 ARCHIVE_DIR = BASE_DIR / "archive"
@@ -22,6 +26,31 @@ GMAIL_USER = os.getenv("GMAIL_USER", "").strip()
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "").replace(" ", "").strip()
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+
+
+def run_with_retry(
+    func: Callable[[], T],
+    task_name: str,
+    max_attempts: int = 3,
+    base_delay_sec: int = 15,
+) -> T:
+    last_exc: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return func()
+        except Exception as exc:
+            last_exc = exc
+            if attempt >= max_attempts:
+                print(f"[ERROR] {task_name} gagal setelah {max_attempts} percobaan: {exc}")
+                raise
+            wait_sec = base_delay_sec * attempt
+            print(
+                f"[WARN] {task_name} gagal (percobaan {attempt}/{max_attempts}): {exc}. "
+                f"Mencoba ulang dalam {wait_sec} detik..."
+            )
+            time.sleep(wait_sec)
+    assert last_exc is not None
+    raise last_exc
 
 
 def decode_mime_words(raw_val: str | None) -> str:
@@ -75,7 +104,7 @@ def fetch_recent_emails(hours: int = 24, max_emails: int = 35) -> list[dict]:
     cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)
     since_imap = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%d-%b-%Y")
 
-    mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+    mail = imaplib.IMAP4_SSL("imap.gmail.com", 993, timeout=30)
     try:
         mail.login(GMAIL_USER, GMAIL_APP_PASSWORD)
         mail.select("INBOX")
@@ -296,21 +325,31 @@ def git_publish(today_str: str) -> None:
         text=True,
         check=True,
     )
-    if not status.stdout.strip():
-        print("[INFO] Tidak ada perubahan file baru untuk di-push.")
-        return
-    subprocess.run(
-        ["git", "commit", "-m", f"Update Email Harian {today_str}"],
-        cwd=BASE_DIR,
-        check=True,
-    )
-    subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
+    if status.stdout.strip():
+        subprocess.run(
+            ["git", "commit", "-m", f"Update Email Harian {today_str}"],
+            cwd=BASE_DIR,
+            check=True,
+        )
+    else:
+        print("[INFO] Tidak ada perubahan file baru untuk di-commit, memeriksa push tertunda...")
+
+    def _do_push() -> None:
+        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
+
+    run_with_retry(_do_push, task_name="Git push ke GitHub Pages", max_attempts=3, base_delay_sec=15)
 
 
 def main() -> None:
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
     today_str = datetime.date.today().isoformat()
-    emails = fetch_recent_emails(hours=24, max_emails=35)
+
+    emails = run_with_retry(
+        lambda: fetch_recent_emails(hours=24, max_emails=35),
+        task_name="Pengambilan email IMAP Gmail",
+        max_attempts=3,
+        base_delay_sec=15,
+    )
 
     if not emails:
         digest = {
