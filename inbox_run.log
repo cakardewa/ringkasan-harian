@@ -14,3 +14,28 @@ To https://github.com/cakardewa/ringkasan-harian.git
    6d51ee5..95ee19e  main -> main
 [OK] Tersimpan ke D:\K12 DRIVE\Ringkasan Harian\latest-inbox.html dan D:\K12 DRIVE\Ringkasan Harian\archive\daily_inbox_digest_2026-11-24.html
 [OK] Selesai push ke GitHub Pages.
+warning: in the working copy of 'news_run.log', LF will be replaced by CRLF the next time Git touches it
+[main bdefd8d] Update Email Harian 2026-11-25
+ 3 files changed, 215 insertions(+), 59 deletions(-)
+ create mode 100644 archive/daily_inbox_digest_2026-11-25.html
+remote: Internal Server Error        
+remote: Request ID CFEA:21F6B8:1EAB28:314F6B:6B062511        
+remote: Time 2026-11-25T00:00:19Z
+To https://github.com/cakardewa/ringkasan-harian.git
+ ! [remote rejected] main -> main (Internal Server Error)
+error: failed to push some refs to 'https://github.com/cakardewa/ringkasan-harian.git'
+[OK] Tersimpan ke D:\K12 DRIVE\Ringkasan Harian\latest-inbox.html dan D:\K12 DRIVE\Ringkasan Harian\archive\daily_inbox_digest_2026-11-25.html
+Traceback (most recent call last):
+  File "D:\K12 DRIVE\Ringkasan Harian\generate_inbox.py", line 348, in <module>
+    main()
+    ~~~~^^
+  File "D:\K12 DRIVE\Ringkasan Harian\generate_inbox.py", line 343, in main
+    git_publish(today_str)
+    ~~~~~~~~~~~^^^^^^^^^^^
+  File "D:\K12 DRIVE\Ringkasan Harian\generate_inbox.py", line 307, in git_publish
+    subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python315\Lib\subprocess.py", line 692, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command ['git', 'push'] returned non-zero exit status 1.
