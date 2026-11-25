@@ -137,9 +137,11 @@ def _parse_single_feed(source: str, url: str, max_per_feed: int) -> list[dict]:
     return feed_items
 
 
-def fetch_feed_items(max_per_feed: int = 5) -> list[dict]:
+def fetch_feed_items(max_per_feed: int = 5, delay_between_feeds: float = 3.0) -> list[dict]:
     items = []
-    for source, url in RSS_FEEDS:
+    for idx, (source, url) in enumerate(RSS_FEEDS):
+        if idx > 0 and delay_between_feeds > 0:
+            time.sleep(delay_between_feeds)
         try:
             feed_items = run_with_retry(
                 lambda s=source, u=url: _parse_single_feed(s, u, max_per_feed),
@@ -148,6 +150,7 @@ def fetch_feed_items(max_per_feed: int = 5) -> list[dict]:
                 base_delay_sec=15,
             )
             items.extend(feed_items)
+            print(f"[OK] RSS {source}: {len(feed_items)} artikel")
         except Exception as exc:
             print(f"[WARN] Melewati RSS {source}: {exc}")
     return items
