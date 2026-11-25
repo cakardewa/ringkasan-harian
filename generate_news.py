@@ -1,4 +1,5 @@
 import datetime
+import html
 import json
 import os
 import re
@@ -7,6 +8,7 @@ import subprocess
 import time
 from pathlib import Path
 from typing import Callable, TypeVar
+from zoneinfo import ZoneInfo
 
 import feedparser
 import requests
@@ -31,6 +33,13 @@ RSS_FEEDS = [
     ("Kompas Tekno", "https://rss.kompas.com/api/feed/tekno"),
     ("CNN Indonesia Tech", "https://www.cnnindonesia.com/teknologi/rss"),
 ]
+
+
+def get_today_wib() -> str:
+    try:
+        return datetime.datetime.now(ZoneInfo("Asia/Jakarta")).date().isoformat()
+    except Exception:
+        return datetime.date.today().isoformat()
 
 
 def run_with_retry(
@@ -180,16 +189,18 @@ def extract_json(raw_text: str) -> dict:
 
 
 def render_html(digest: dict, engine_used: str, today_str: str) -> str:
-    headline_note = digest.get("headline_note", "Kurasi berita harian otomatis.")
+    headline_note = html.escape(digest.get("headline_note", "Kurasi berita harian otomatis."))
+    safe_engine = html.escape(engine_used)
+    safe_date = html.escape(today_str)
     articles = digest.get("articles", [])
 
     cards_html = []
     for art in articles:
-        pillar = art.get("pillar", "Umum")
-        source = art.get("source", "")
-        title = art.get("title", "")
-        takeaway = art.get("takeaway", "")
-        url = art.get("url", "#")
+        pillar = html.escape(art.get("pillar", "Umum"))
+        source = html.escape(art.get("source", ""))
+        title = html.escape(art.get("title", ""))
+        takeaway = html.escape(art.get("takeaway", ""))
+        url = html.escape(art.get("url", "#"), quote=True)
         cards_html.append(
             f"""
             <article class="card">
@@ -207,7 +218,7 @@ def render_html(digest: dict, engine_used: str, today_str: str) -> str:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Berita CV &amp; Tren Industri — {today_str}</title>
+  <title>Berita CV &amp; Tren Industri — {safe_date}</title>
   <style>
     :root {{ --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --muted: #94a3b8; --accent: #38bdf8; --border: #334155; }}
     * {{ box-sizing: border-box; }}
@@ -232,7 +243,7 @@ def render_html(digest: dict, engine_used: str, today_str: str) -> str:
   <div class="wrap">
     <header>
       <h1>Berita CV &amp; Tren Industri</h1>
-      <p class="sub">Edisi {today_str} • Mesin: {engine_used}</p>
+      <p class="sub">Edisi {safe_date} • Mesin: {safe_engine}</p>
     </header>
     <div class="note">{headline_note}</div>
     <div class="grid">
@@ -271,7 +282,7 @@ def git_publish(today_str: str) -> None:
 
 def main() -> None:
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
-    today_str = datetime.date.today().isoformat()
+    today_str = get_today_wib()
     items = fetch_feed_items()
     if not items:
         raise RuntimeError("Tidak ada item berita yang berhasil diambil dari RSS.")

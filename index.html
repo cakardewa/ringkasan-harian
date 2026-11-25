@@ -91,6 +91,23 @@
     .viewer-bar strong {
       color: var(--text);
     }
+    .viewer-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .refresh-btn {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    .refresh-btn:hover {
+      border-color: var(--accent);
+    }
     .viewer-bar a {
       color: var(--accent);
       text-decoration: none;
@@ -136,9 +153,14 @@
     <section class="viewer-card">
       <div class="viewer-bar">
         <span>Aktif: <strong id="activeLabel">Berita CV (Edisi Terbaru)</strong></span>
-        <a id="openFullLink" href="./latest-career-news.html" target="_blank">
-          Buka di Tab Baru ↗
-        </a>
+        <div class="viewer-actions">
+          <button type="button" id="forceReloadBtn" class="refresh-btn">
+            Muat Ulang Data
+          </button>
+          <a id="openFullLink" href="./latest-career-news.html" target="_blank" rel="noopener noreferrer">
+            Buka di Tab Baru ↗
+          </a>
+        </div>
       </div>
       <iframe
         id="digestFrame"
@@ -154,6 +176,16 @@
     const frame = document.getElementById('digestFrame');
     const activeLabel = document.getElementById('activeLabel');
     const openFullLink = document.getElementById('openFullLink');
+    const forceReloadBtn = document.getElementById('forceReloadBtn');
+
+    let currentBaseSrc = './latest-career-news.html';
+
+    function loadSource(baseSrc, bustCache = false) {
+      currentBaseSrc = baseSrc;
+      const finalUrl = bustCache ? `${baseSrc}?v=${Date.now()}` : baseSrc;
+      frame.src = finalUrl;
+      openFullLink.href = finalUrl;
+    }
 
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -163,10 +195,13 @@
         const targetSrc = btn.getAttribute('data-src');
         const labelText = btn.getAttribute('data-label');
 
-        frame.src = targetSrc;
-        openFullLink.href = targetSrc;
         activeLabel.textContent = labelText;
+        loadSource(targetSrc, false);
       });
+    });
+
+    forceReloadBtn.addEventListener('click', () => {
+      loadSource(currentBaseSrc, true);
     });
   </script>
 </body>
