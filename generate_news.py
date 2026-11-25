@@ -29,7 +29,10 @@ RSS_FEEDS = [
     ("Ars Technica", "https://feeds.arstechnica.com/arstechnica/technology-lab"),
     ("The Verge", "https://www.theverge.com/rss/index.xml"),
     ("MusicRadar", "https://www.musicradar.com/rss"),
-    ("Sound On Sound", "https://www.soundonsound.com/news/rss"),
+    (
+        "Sound On Sound",
+        "https://news.google.com/rss/search?q=site:soundonsound.com&hl=en-US&gl=US&ceid=US:en",
+    ),
     ("Kompas Tekno", "https://rss.kompas.com/api/feed/tekno"),
     ("CNN Indonesia Tech", "https://www.cnnindonesia.com/teknologi/rss"),
 ]
@@ -74,21 +77,30 @@ def _parse_single_feed(source: str, url: str, max_per_feed: int) -> list[dict]:
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/131.0.0.0 Safari/537.36"
         ),
-        "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+        "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
     }
     resp = requests.get(url, timeout=20, headers=headers)
     resp.raise_for_status()
+
+    raw_prefix = resp.text.lstrip()[:200].lower()
+    if raw_prefix.startswith("<!doctype html") or raw_prefix.startswith("<html"):
+        raise RuntimeError(
+            f"Server {source} mengembalikan halaman HTML (HTTP {resp.status_code}), bukan feed XML/RSS"
+        )
+
     parsed = feedparser.parse(resp.content)
-    if getattr(parsed, "bozo", False) and not parsed.entries:
-        raise RuntimeError(f"Format RSS tidak valid untuk {source}")
+    if not parsed.entries:
+        raise RuntimeError(f"Format RSS tidak valid atau daftar artikel kosong untuk {source}")
 
     feed_items = []
     for entry in parsed.entries[:max_per_feed]:
         title = (entry.get("title") or "").strip()
+        if source == "Sound On Sound" and title.endswith(" - Sound On Sound"):
+            title = title[: -len(" - Sound On Sound")].strip()
         link = (entry.get("link") or "").strip()
         summary = re.sub(r"<[^>]+>", " ", entry.get("summary") or "")
-        summary = re.sub(r"\s+", " ", summary).strip()[:320]
+        summary = html.unescape(re.sub(r"\s+", " ", summary)).strip()[:320]
         if title and link:
             feed_items.append(
                 {
