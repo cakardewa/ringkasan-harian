@@ -4,12 +4,16 @@ import os
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
+from typing import Callable, TypeVar
 
 import feedparser
 import requests
 from dotenv import load_dotenv
 from google import genai
+
+T = TypeVar("T")
 
 BASE_DIR = Path(__file__).resolve().parent
 ARCHIVE_DIR = BASE_DIR / "archive"
@@ -20,7 +24,7 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 
 RSS_FEEDS = [
-    ("TechCrunch", "https://techcrunch.com/feed/"),
+    ("Ars Technica", "https://feeds.arstechnica.com/arstechnica/technology-lab"),
     ("The Verge", "https://www.theverge.com/rss/index.xml"),
     ("MusicRadar", "https://www.musicradar.com/rss"),
     ("Sound On Sound", "https://www.soundonsound.com/news/rss"),
@@ -29,27 +33,78 @@ RSS_FEEDS = [
 ]
 
 
+def run_with_retry(
+    func: Callable[[], T],
+    task_name: str,
+    max_attempts: int = 3,
+    base_delay_sec: int = 15,
+) -> T:
+    last_exc: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return func()
+        except Exception as exc:
+            last_exc = exc
+            if attempt >= max_attempts:
+                print(f"[ERROR] {task_name} gagal setelah {max_attempts} percobaan: {exc}")
+                raise
+            wait_sec = base_delay_sec * attempt
+            print(
+                f"[WARN] {task_name} gagal (percobaan {attempt}/{max_attempts}): {exc}. "
+                f"Mencoba ulang dalam {wait_sec} detik..."
+            )
+            time.sleep(wait_sec)
+    assert last_exc is not None
+    raise last_exc
+
+
+def _parse_single_feed(source: str, url: str, max_per_feed: int) -> list[dict]:
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/131.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
+    }
+    resp = requests.get(url, timeout=20, headers=headers)
+    resp.raise_for_status()
+    parsed = feedparser.parse(resp.content)
+    if getattr(parsed, "bozo", False) and not parsed.entries:
+        raise RuntimeError(f"Format RSS tidak valid untuk {source}")
+
+    feed_items = []
+    for entry in parsed.entries[:max_per_feed]:
+        title = (entry.get("title") or "").strip()
+        link = (entry.get("link") or "").strip()
+        summary = re.sub(r"<[^>]+>", " ", entry.get("summary") or "")
+        summary = re.sub(r"\s+", " ", summary).strip()[:320]
+        if title and link:
+            feed_items.append(
+                {
+                    "source": source,
+                    "title": title,
+                    "link": link,
+                    "summary": summary,
+                }
+            )
+    return feed_items
+
+
 def fetch_feed_items(max_per_feed: int = 5) -> list[dict]:
     items = []
     for source, url in RSS_FEEDS:
         try:
-            parsed = feedparser.parse(url)
-            for entry in parsed.entries[:max_per_feed]:
-                title = (entry.get("title") or "").strip()
-                link = (entry.get("link") or "").strip()
-                summary = re.sub(r"<[^>]+>", " ", entry.get("summary") or "")
-                summary = re.sub(r"\s+", " ", summary).strip()[:320]
-                if title and link:
-                    items.append(
-                        {
-                            "source": source,
-                            "title": title,
-                            "link": link,
-                            "summary": summary,
-                        }
-                    )
+            feed_items = run_with_retry(
+                lambda s=source, u=url: _parse_single_feed(s, u, max_per_feed),
+                task_name=f"Ambil RSS {source}",
+                max_attempts=3,
+                base_delay_sec=15,
+            )
+            items.extend(feed_items)
         except Exception as exc:
-            print(f"[WARN] Gagal memuat RSS {source}: {exc}")
+            print(f"[WARN] Melewati RSS {source} setelah percobaan ulang gagal: {exc}")
     return items
 
 
@@ -199,15 +254,19 @@ def git_publish(today_str: str) -> None:
         text=True,
         check=True,
     )
-    if not status.stdout.strip():
-        print("[INFO] Tidak ada perubahan file baru untuk di-push.")
-        return
-    subprocess.run(
-        ["git", "commit", "-m", f"Update Berita CV {today_str}"],
-        cwd=BASE_DIR,
-        check=True,
-    )
-    subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
+    if status.stdout.strip():
+        subprocess.run(
+            ["git", "commit", "-m", f"Update Berita CV {today_str}"],
+            cwd=BASE_DIR,
+            check=True,
+        )
+    else:
+        print("[INFO] Tidak ada perubahan file baru untuk di-commit, memeriksa push tertunda...")
+
+    def _do_push() -> None:
+        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
+
+    run_with_retry(_do_push, task_name="Git push ke GitHub Pages", max_attempts=3, base_delay_sec=15)
 
 
 def main() -> None:
