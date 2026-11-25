@@ -33,9 +33,21 @@ RSS_FEEDS = [
         "Sound On Sound",
         "https://news.google.com/rss/search?q=site:soundonsound.com&hl=en-US&gl=US&ceid=US:en",
     ),
-    ("Kompas Tekno", "https://rss.kompas.com/api/feed/tekno"),
+    (
+        "Kompas Tekno",
+        "https://news.google.com/rss/search?q=site:tekno.kompas.com&hl=id&gl=ID&ceid=ID:id",
+    ),
     ("CNN Indonesia Tech", "https://www.cnnindonesia.com/teknologi/rss"),
 ]
+
+SOURCE_TITLE_SUFFIXES = {
+    "Sound On Sound": (" - Sound On Sound",),
+    "Kompas Tekno": (" - Kompas.com", " - KOMPAS.com"),
+}
+
+
+class NonRetriableFeedError(RuntimeError):
+    """Error permanen pada feed (mis. HTTP 403/404) yang tidak perlu diulang."""
 
 
 def get_today_wib() -> str:
@@ -55,6 +67,8 @@ def run_with_retry(
     for attempt in range(1, max_attempts + 1):
         try:
             return func()
+        except NonRetriableFeedError:
+            raise
         except Exception as exc:
             last_exc = exc
             if attempt >= max_attempts:
@@ -70,6 +84,14 @@ def run_with_retry(
     raise last_exc
 
 
+def _clean_entry_title(source: str, title: str) -> str:
+    cleaned = title.strip()
+    for suffix in SOURCE_TITLE_SUFFIXES.get(source, ()):
+        if cleaned.endswith(suffix):
+            cleaned = cleaned[: -len(suffix)].strip()
+    return cleaned
+
+
 def _parse_single_feed(source: str, url: str, max_per_feed: int) -> list[dict]:
     headers = {
         "User-Agent": (
@@ -78,14 +100,18 @@ def _parse_single_feed(source: str, url: str, max_per_feed: int) -> list[dict]:
             "Chrome/131.0.0.0 Safari/537.36"
         ),
         "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
+        "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
     }
     resp = requests.get(url, timeout=20, headers=headers)
+    if resp.status_code in (401, 403, 404, 410):
+        raise NonRetriableFeedError(
+            f"HTTP {resp.status_code} ({resp.reason}) untuk {source} — langsung dilewati"
+        )
     resp.raise_for_status()
 
     raw_prefix = resp.text.lstrip()[:200].lower()
     if raw_prefix.startswith("<!doctype html") or raw_prefix.startswith("<html"):
-        raise RuntimeError(
+        raise NonRetriableFeedError(
             f"Server {source} mengembalikan halaman HTML (HTTP {resp.status_code}), bukan feed XML/RSS"
         )
 
@@ -95,9 +121,7 @@ def _parse_single_feed(source: str, url: str, max_per_feed: int) -> list[dict]:
 
     feed_items = []
     for entry in parsed.entries[:max_per_feed]:
-        title = (entry.get("title") or "").strip()
-        if source == "Sound On Sound" and title.endswith(" - Sound On Sound"):
-            title = title[: -len(" - Sound On Sound")].strip()
+        title = _clean_entry_title(source, entry.get("title") or "")
         link = (entry.get("link") or "").strip()
         summary = re.sub(r"<[^>]+>", " ", entry.get("summary") or "")
         summary = html.unescape(re.sub(r"\s+", " ", summary)).strip()[:320]
@@ -125,7 +149,7 @@ def fetch_feed_items(max_per_feed: int = 5) -> list[dict]:
             )
             items.extend(feed_items)
         except Exception as exc:
-            print(f"[WARN] Melewati RSS {source} setelah percobaan ulang gagal: {exc}")
+            print(f"[WARN] Melewati RSS {source}: {exc}")
     return items
 
 
