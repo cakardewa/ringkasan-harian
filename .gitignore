@@ -2,3 +2,6 @@
 .netlify
 .env
 *.log
+
+*.ps1
+*.log
