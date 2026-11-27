@@ -22,3 +22,17 @@ To https://github.com/cakardewa/ringkasan-harian.git
    bdefd8d..3b204f4  main -> main
 [OK] Tersimpan ke D:\K12 DRIVE\Ringkasan Harian\latest-career-news.html dan D:\K12 DRIVE\Ringkasan Harian\archive\CV_Career_News_Digest_2026-11-25.html
 [OK] Selesai push ke GitHub Pages.
+warning: in the working copy of 'inbox_run.log', LF will be replaced by CRLF the next time Git touches it
+[main 9a85413] Update Berita CV 2026-11-26
+ 3 files changed, 173 insertions(+), 8 deletions(-)
+ create mode 100644 archive/CV_Career_News_Digest_2026-11-26.html
+To https://github.com/cakardewa/ringkasan-harian.git
+   9d1dda4..9a85413  main -> main
+[OK] RSS Ars Technica: 5 artikel
+[OK] RSS The Verge: 5 artikel
+[OK] RSS MusicRadar: 5 artikel
+[OK] RSS Sound On Sound: 5 artikel
+[OK] RSS Kompas Tekno: 5 artikel
+[OK] RSS CNN Indonesia Tech: 5 artikel
+[OK] Tersimpan ke D:\K12 DRIVE\Ringkasan Harian\latest-career-news.html dan D:\K12 DRIVE\Ringkasan Harian\archive\CV_Career_News_Digest_2026-11-26.html
+[OK] Selesai push ke GitHub Pages.
